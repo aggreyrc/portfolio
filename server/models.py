@@ -1,12 +1,13 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from datetime import datetime
+from sqlalchemy_serializer import SerializerMixin
 
 
 db =SQLAlchemy()
 
 # projects model
-class Project(db.Model):
+class Project(db.Model,SerializerMixin):
     __tablename__ = 'projects'
     
     id = db.Column(db.Integer, primary_key=True)
@@ -14,7 +15,6 @@ class Project(db.Model):
     description = db.Column(db.Text, nullable=False)
     github_url = db.Column(db.String(200), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    image_url = db.Column(db.String(255), nullable=True) 
     
     
     def __repr__(self):

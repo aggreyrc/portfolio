@@ -8,9 +8,20 @@ import os
 
 from models import Project, db
 
+import cloudinary
+import cloudinary.uploader
+
+# Configure Cloudinary
+cloudinary.config(
+    cloud_name="your_cloud_name",
+    api_key="your_api_key",
+    api_secret="your_api_secret"
+)
+
+
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URI')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URI', 'sqlite:///app.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.json.compact = False
 
@@ -31,3 +42,26 @@ class Home(Resource):
                ]
           },200
 api.add_resource(Home, '/')
+
+# Projects
+class Projects(Resource):
+    # fetching all projects
+    def get(self):
+        project_list = []
+        projects = Project.query.all()
+        for project in projects:
+            project_dict = {
+                "id": project.id,
+                "name": project.name,
+                "description": project.description,
+                "github_url": project.github_url
+            }
+            project_list.append(project_dict)
+        return make_response(project_list, 200)
+    
+api.add_resource(Projects, '/projects')
+
+
+if __name__ == '__main__':
+   port = int(os.environ.get("PORT", 5000))
+   app.run(host="0.0.0.0", port=port)
